@@ -23,18 +23,25 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class BackendProxyService {
 
+    private static final String BOOKS_PREFIX = "/books";
+    private static final String CUSTOMERS_PREFIX = "/customers";
+
     private final RestTemplate restTemplate;
     private final MobileResponseTransformer responseTransformer;
     private final String backendBaseUrl;
+    private final String bookServiceBaseUrl;
+    private final String customerServiceBaseUrl;
 
     public BackendProxyService(RestTemplate restTemplate,
             MobileResponseTransformer responseTransformer,
-            @Value("${backend.base-url}") String backendBaseUrl) {
+            @Value("${backend.base-url}") String backendBaseUrl,
+            @Value("${book-service.base-url}") String bookServiceBaseUrl,
+            @Value("${customer-service.base-url}") String customerServiceBaseUrl) {
         this.restTemplate = restTemplate;
         this.responseTransformer = responseTransformer;
-        this.backendBaseUrl = backendBaseUrl.endsWith("/")
-            ? backendBaseUrl.substring(0, backendBaseUrl.length() - 1)
-            : backendBaseUrl;
+        this.backendBaseUrl = normalizeBaseUrl(backendBaseUrl);
+        this.bookServiceBaseUrl = normalizeBaseUrl(bookServiceBaseUrl);
+        this.customerServiceBaseUrl = normalizeBaseUrl(customerServiceBaseUrl);
     }
 
     public ResponseEntity<String> forward(HttpServletRequest request) throws IOException {
@@ -55,11 +62,30 @@ public class BackendProxyService {
     }
 
     private URI buildTargetUri(HttpServletRequest request) {
-        return UriComponentsBuilder.fromHttpUrl(backendBaseUrl)
+        return UriComponentsBuilder.fromHttpUrl(resolveBaseUrl(request))
             .path(request.getRequestURI())
             .query(request.getQueryString())
             .build(true) // Components are already encoded by the incoming request
             .toUri();
+    }
+
+    private String resolveBaseUrl(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        if (path.startsWith(BOOKS_PREFIX)) {
+            return bookServiceBaseUrl;
+        }
+
+        if (path.startsWith(CUSTOMERS_PREFIX)) {
+            return customerServiceBaseUrl;
+        }
+
+        return backendBaseUrl;
+    }
+
+    private String normalizeBaseUrl(String baseUrl) {
+        return baseUrl.endsWith("/")
+            ? baseUrl.substring(0, baseUrl.length() - 1)
+            : baseUrl;
     }
 
     private HttpHeaders copyRequestHeaders(HttpServletRequest request) {

@@ -20,8 +20,10 @@ spec:
           ports:
             - containerPort: 80
           env:
-            - name: URL_BASE_BACKEND_SERVICES
-              value: http://backend-router
+            - name: BOOK_SERVICE_BASE_URL
+              value: http://book-service.bookstore-ns.svc.cluster.local:3000
+            - name: CUSTOMER_SERVICE_BASE_URL
+              value: http://customer-service.bookstore-ns.svc.cluster.local:3000
           livenessProbe:
             httpGet:
               path: /status

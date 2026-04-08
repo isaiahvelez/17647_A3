@@ -50,6 +50,25 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.4.4</version>
+				<configuration>
+					<from>
+						<image>eclipse-temurin:17-jre-jammy</image>
+					</from>
+					<to>
+						<image>${jib.to.image}</image>
+					</to>
+					<container>
+						<format>OCI</format>
+						<ports>
+							<port>80</port>
+						</ports>
+					</container>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.5.5</version>
