@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crm-service
+  namespace: bookstore-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crm-service
+  template:
+    metadata:
+      labels:
+        app: crm-service
+    spec:
+      containers:
+        - name: crm-service
+          image: YOUR_ECR_URI/crm-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: BOOKSTORE_ANDREW_ID
+              value: ivelez
+            - name: CUSTOMER_EVENTS_TOPIC
+              value: ivelez.customer.evt
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: YOUR_KAFKA_BROKERS
+            - name: SPRING_KAFKA_CONSUMER_GROUP
+              value: crm-service
+            - name: SPRING_KAFKA_LISTENER_AUTO_STARTUP
+              value: "true"
+            - name: SPRING_MAIL_HOST
+              value: smtp.gmail.com
+            - name: SPRING_MAIL_PORT
+              value: "587"
+            - name: SPRING_MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: crm-mail-secret
+                  key: gmail-username
+            - name: SPRING_MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: crm-mail-secret
+                  key: gmail-app-password
+            - name: SPRING_MAIL_SMTP_AUTH
+              value: "true"
+            - name: SPRING_MAIL_SMTP_STARTTLS_ENABLE
+              value: "true"

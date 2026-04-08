@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-service
+  namespace: bookstore-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: customer-service
+  template:
+    metadata:
+      labels:
+        app: customer-service
+    spec:
+      containers:
+        - name: customer-service
+          image: YOUR_ECR_URI/customer-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://YOUR_RDS_ENDPOINT:3306/customersdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: YOUR_DB_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: YOUR_DB_PASSWORD
+            - name: BOOKSTORE_ANDREW_ID
+              value: ivelez
+            - name: CUSTOMER_EVENTS_TOPIC
+              value: ivelez.customer.evt
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: YOUR_KAFKA_BROKERS
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
