@@ -31,7 +31,7 @@ spec:
             - name: RECOMMENDATION_SERVICE_URL_TEMPLATE
               value: YOUR_RECOMMENDATION_URL_TEMPLATE_WITH_ISBN_PLACEHOLDER
             - name: RECOMMENDATION_TIMEOUT_MILLIS
-              value: "3000"
+              value: "8000"
             - name: RECOMMENDATION_CIRCUIT_OPEN_SECONDS
               value: "60"
             - name: RECOMMENDATION_CIRCUIT_STATE_FILE
