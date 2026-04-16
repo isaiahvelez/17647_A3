@@ -37,14 +37,14 @@ public class RequestValidationFilter extends OncePerRequestFilter {
         // Checking the token here keeps the backend services focused on bookstore behavior.
         if (!jwtValidator.isValidBearerToken(request.getHeader("Authorization"))) {
             log.warn("Unauthorized: JWT validation failed for {}", request.getRequestURI());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;
         }
 
         // This BFF is only meant to answer the mobile apps.
         if (clientType == null || !VALID_CLIENT_TYPES.contains(clientType.toLowerCase(Locale.ROOT))) {
             log.warn("Blocking request due to invalid X-Client-Type: {}", clientType);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid X-Client-Type");
             return;
         }
 
