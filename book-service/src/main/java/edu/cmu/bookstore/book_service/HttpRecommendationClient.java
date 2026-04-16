@@ -1,5 +1,6 @@
 package edu.cmu.bookstore.book_service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -36,7 +37,9 @@ public class HttpRecommendationClient implements RecommendationClient {
         @Value("${recommendation.service.url-template:}") String urlTemplate,
         @Value("${recommendation.timeout-millis:3000}") long timeoutMillis
     ) {
-        this.httpClient = HttpClient.newHttpClient();
+        this.httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofMillis(timeoutMillis))
+            .build();
         this.objectMapper = objectMapper;
         this.urlTemplate = urlTemplate;
         this.timeoutMillis = timeoutMillis;
@@ -64,6 +67,8 @@ public class HttpRecommendationClient implements RecommendationClient {
             return parseBody(response.body());
         } catch (HttpTimeoutException ex) {
             throw new RecommendationTimeoutException("Recommendation service timed out", ex);
+        } catch (IOException ex) {
+            throw new RecommendationTimeoutException("Recommendation service was unavailable", ex);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             throw new RecommendationTimeoutException("Recommendation request interrupted", ex);
@@ -98,7 +103,7 @@ public class HttpRecommendationClient implements RecommendationClient {
         for (JsonNode node : arrayNode) {
             String isbn = textValue(node, "ISBN", "isbn");
             String title = textValue(node, "title", "Title");
-            String author = textValue(node, "Author", "author");
+            String author = textValue(node, "Author", "author", "authors");
 
             if ((isbn == null || isbn.isBlank())
                 && (title == null || title.isBlank())

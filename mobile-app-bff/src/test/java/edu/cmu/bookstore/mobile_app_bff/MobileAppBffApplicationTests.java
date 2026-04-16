@@ -73,6 +73,15 @@ class MobileAppBffApplicationTests {
     }
 
     @Test
+    void prioritizesUnauthorizedOverWrongClientType() throws Exception {
+        mockMvc.perform(get("/customers")
+                .queryParam("userId", "starlord2002@gmail.com")
+                .header("X-Client-Type", "Web")
+                .header(AUTHORIZATION, "Bearer bad-token"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void returnsLocalStatusWhenHeadersAreValid() throws Exception {
         mockMvc.perform(get("/status")
                 .header("X-Client-Type", "iOS")

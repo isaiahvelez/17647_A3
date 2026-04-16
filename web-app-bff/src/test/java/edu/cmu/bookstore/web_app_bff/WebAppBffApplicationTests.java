@@ -79,6 +79,14 @@ class WebAppBffApplicationTests {
     }
 
     @Test
+    void prioritizesUnauthorizedOverWrongClientType() throws Exception {
+        mockMvc.perform(get("/books/978-0136886099")
+                .header("X-Client-Type", "Android")
+                .header(AUTHORIZATION, "Bearer bad-token"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void rejectsInvalidJwtClaims() throws Exception {
         mockMvc.perform(get("/status")
                 .header("X-Client-Type", "Web")

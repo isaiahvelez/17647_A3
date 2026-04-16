@@ -28,6 +28,11 @@ spec:
             httpGet:
               path: /status
               port: 80
+              httpHeaders:
+                - name: X-Client-Type
+                  value: iOS
+                - name: Authorization
+                  value: Bearer eyJhbGciOiAibm9uZSIsICJ0eXAiOiAiSldUIn0.eyJzdWIiOiAic3RhcmxvcmQiLCAiaXNzIjogImNtdS5lZHUiLCAiZXhwIjogNDEwMjQ0NDgwMH0.x
             initialDelaySeconds: 15
             periodSeconds: 15
             timeoutSeconds: 5
