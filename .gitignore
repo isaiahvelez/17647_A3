@@ -28,3 +28,5 @@ replay_pid*
 tmp/
 **/target/
 crm-service/k8s/mail-secret.yaml
+
+labsuser.pem
